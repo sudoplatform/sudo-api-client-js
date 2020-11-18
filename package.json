@@ -45,8 +45,8 @@
     "@babel/preset-typescript": "^7.10.4",
     "@react-native-community/async-storage": "^1.11.0",
     "@react-native-community/netinfo": "^5.0.0",
-    "@sudoplatform/sudo-common": "^1.0.5",
-    "@sudoplatform/sudo-user": "^1.0.10",
+    "@sudoplatform/sudo-common": "^2.0.0",
+    "@sudoplatform/sudo-user": "^2.0.0",
     "@types/jest": "^26.0.13",
     "@types/node-localstorage": "^1.3.0",
     "@typescript-eslint/eslint-plugin": "^3.7.1",
@@ -80,8 +80,8 @@
     "**/mem": "^4.0.0"
   },
   "peerDependencies": {
-    "@sudoplatform/sudo-common": "^1.0.5",
-    "@sudoplatform/sudo-user": "^1.0.10",
+    "@sudoplatform/sudo-common": "^2.0.0",
+    "@sudoplatform/sudo-user": "^2.0.0",
     "io-ts": "^2.2.11"
   }
 }
