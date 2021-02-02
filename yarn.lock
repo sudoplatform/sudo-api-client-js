@@ -1386,10 +1386,10 @@
   dependencies:
     browser-bunyan "^1.6.3"
 
-"@sudoplatform/sudo-user@^3.0.0":
-  version "3.0.1"
-  resolved "https://registry.yarnpkg.com/@sudoplatform/sudo-user/-/sudo-user-3.0.1.tgz#03049accbb88d33cda5aa93b81d7626198dfe438"
-  integrity sha512-6xmhLD3V8psaq09oH2AlFkW+8JIAHJioA4kL8nsZSccoA5uAOGDqdUHC0SHluW9jj0tnk/QK78ads+qVQu2IXw==
+"@sudoplatform/sudo-user@^4.0.0":
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/@sudoplatform/sudo-user/-/sudo-user-4.0.0.tgz#310f43d3f0137d7df8c9c106fabb63006341a39d"
+  integrity sha512-/geYjpxX7CNZXqlatmTqhhlPH0gNk36DZvoWOP8d72jlZM3+7jNaKttJcF43Rssa/napxkA3qrGns2HElFiXgg==
   dependencies:
     "@graphql-typed-document-node/core" "^3.1.0"
     amazon-cognito-auth-js "^1.3.3"
