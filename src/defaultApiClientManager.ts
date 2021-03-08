@@ -111,9 +111,10 @@ export class DefaultApiClientManager implements ApiClientManager {
     options?: ClientOptions,
   ): AWSAppSyncClient<NormalizedCacheObject> {
     if (!this._config) {
-      const config = DefaultConfigurationManager.getInstance().bindConfigSet<
-        ApiClientConfig
-      >(ApiClientConfig, 'apiService')
+      const config = DefaultConfigurationManager.getInstance().bindConfigSet<ApiClientConfig>(
+        ApiClientConfig,
+        'apiService',
+      )
 
       this._config = config
     }

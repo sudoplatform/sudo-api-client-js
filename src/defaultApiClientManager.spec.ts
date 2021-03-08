@@ -82,7 +82,7 @@ describe('Api Client Manager', () => {
       DefaultApiClientManager.getInstance().unsetConfig()
 
       const keyManager = new KeyManager()
-      const sudoUserClient = new DefaultSudoUserClient(keyManager)
+      const sudoUserClient = new DefaultSudoUserClient({ keyManager })
 
       const clientOptions = {
         disableOffline: true,
@@ -110,7 +110,7 @@ describe('Api Client Manager', () => {
       )
 
       const keyManager = new KeyManager()
-      const sudoUserClient = new DefaultSudoUserClient(keyManager)
+      const sudoUserClient = new DefaultSudoUserClient({ keyManager })
 
       const client = DefaultApiClientManager.getInstance()
         .setConfig(clientConfig)
