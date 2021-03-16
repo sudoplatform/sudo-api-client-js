@@ -2,7 +2,7 @@ import {
   ConfigurationNotSetError,
   DefaultConfigurationManager,
 } from '@sudoplatform/sudo-common'
-import { DefaultSudoUserClient, KeyManager } from '@sudoplatform/sudo-user'
+import { DefaultSudoUserClient } from '@sudoplatform/sudo-user'
 import { DefaultApiClientManager } from './defaultApiClientManager'
 import { SudoUserClientNotSetError } from './error'
 require('isomorphic-fetch')
@@ -81,8 +81,7 @@ describe('Api Client Manager', () => {
 
       DefaultApiClientManager.getInstance().unsetConfig()
 
-      const keyManager = new KeyManager()
-      const sudoUserClient = new DefaultSudoUserClient({ keyManager })
+      const sudoUserClient = new DefaultSudoUserClient()
 
       const clientOptions = {
         disableOffline: true,
@@ -109,8 +108,7 @@ describe('Api Client Manager', () => {
         JSON.stringify(sudoUserConfig),
       )
 
-      const keyManager = new KeyManager()
-      const sudoUserClient = new DefaultSudoUserClient({ keyManager })
+      const sudoUserClient = new DefaultSudoUserClient()
 
       const client = DefaultApiClientManager.getInstance()
         .setConfig(clientConfig)
