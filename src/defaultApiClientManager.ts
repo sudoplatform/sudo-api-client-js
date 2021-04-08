@@ -131,7 +131,15 @@ export class DefaultApiClientManager implements ApiClientManager {
         region: this._config.region,
         auth: {
           type: AUTH_TYPE.AMAZON_COGNITO_USER_POOLS,
-          jwtToken: async () => await authClient.getLatestAuthToken(),
+          jwtToken: async () => {
+            try {
+              return await authClient.getLatestAuthToken()
+            } catch (error) {
+              // Return empty string so the graphql request can fail and the error can be processed by the caller.
+              // This is a workaround for AWSAppSyncClient not handling rejected promise if getLatestAuthToken fails.
+              return ''
+            }
+          },
         },
         disableOffline: options?.disableOffline ?? false,
       })

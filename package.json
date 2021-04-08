@@ -79,7 +79,8 @@
     "**/minimist": "^1.2.3",
     "**/mem": "^4.0.0",
     "**/yargs-parser": "^18.1.3",
-    "**/xmldom": "^0.5.0"
+    "**/xmldom": "^0.5.0",
+    "**/y18n": "^5.0.5"
   },
   "peerDependencies": {
     "@sudoplatform/sudo-common": "^3.4.0",
