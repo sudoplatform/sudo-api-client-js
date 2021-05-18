@@ -1,6 +1,7 @@
 import {
   ConfigurationNotSetError,
   DefaultConfigurationManager,
+  DefaultLogger,
 } from '@sudoplatform/sudo-common'
 import { DefaultSudoUserClient } from '@sudoplatform/sudo-user'
 import { DefaultApiClientManager } from './defaultApiClientManager'
@@ -65,9 +66,8 @@ describe('Api Client Manager', () => {
         apiUrl: 'https://aws',
       }
 
-      const apiClientManager = DefaultApiClientManager.getInstance().setConfig(
-        config,
-      )
+      const apiClientManager =
+        DefaultApiClientManager.getInstance().setConfig(config)
 
       expect(() => {
         apiClientManager.getClient()
@@ -116,6 +116,49 @@ describe('Api Client Manager', () => {
         .getClient(clientOptions)
 
       expect(client).toBeDefined()
+    })
+
+    it('should invalidate client when sudoUserClient is reset', () => {
+      const clientConfig = {
+        region: 'us-east-1',
+        apiUrl: 'https://aws',
+      }
+
+      const clientOptions = {
+        disableOffline: true,
+      }
+
+      DefaultConfigurationManager.getInstance().setConfig(
+        JSON.stringify(sudoUserConfig),
+      )
+
+      const logger1 = new DefaultLogger('sudo-user-client-1-logger')
+      const logger2 = new DefaultLogger('sudo-user-client-2-logger')
+      expect(logger1 === logger2).toEqual(false)
+
+      const sudoUserClient1 = new DefaultSudoUserClient({ logger: logger1 })
+      const sudoUserClient2 = new DefaultSudoUserClient({ logger: logger2 })
+      expect(sudoUserClient1 === sudoUserClient2).toEqual(false)
+
+      let client = DefaultApiClientManager.getInstance()
+        .setConfig(clientConfig)
+        .setAuthClient(sudoUserClient1)
+        .getClient(clientOptions)
+
+      expect(client).toBeDefined()
+
+      let privateClient = (DefaultApiClientManager.getInstance() as any)[
+        '_client'
+      ]
+      expect(privateClient).toBeDefined()
+
+      DefaultApiClientManager.getInstance().setAuthClient(sudoUserClient2)
+      privateClient = (DefaultApiClientManager.getInstance() as any)['_client']
+      expect(privateClient).toBeUndefined()
+
+      client = DefaultApiClientManager.getInstance().getClient()
+      privateClient = (DefaultApiClientManager.getInstance() as any)['_client']
+      expect(privateClient).toBeDefined()
     })
   })
 })

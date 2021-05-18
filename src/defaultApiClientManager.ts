@@ -92,7 +92,11 @@ export class DefaultApiClientManager implements ApiClientManager {
   }
 
   public setAuthClient(authClient: SudoUserClient): DefaultApiClientManager {
-    this._authClient = authClient
+    if (authClient !== this._authClient) {
+      this._authClient = authClient
+      // Invalidate any existing client since we have a new auth client
+      this._client = undefined
+    }
 
     return DefaultApiClientManager.instance
   }
@@ -111,10 +115,11 @@ export class DefaultApiClientManager implements ApiClientManager {
     options?: ClientOptions,
   ): AWSAppSyncClient<NormalizedCacheObject> {
     if (!this._config) {
-      const config = DefaultConfigurationManager.getInstance().bindConfigSet<ApiClientConfig>(
-        ApiClientConfig,
-        'apiService',
-      )
+      const config =
+        DefaultConfigurationManager.getInstance().bindConfigSet<ApiClientConfig>(
+          ApiClientConfig,
+          'apiService',
+        )
 
       this._config = config
     }
