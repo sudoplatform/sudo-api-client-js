@@ -93,12 +93,6 @@
 								<li class="tsd-kind-variable tsd-is-external"><a href="globals.html#apiclientconfig" class="tsd-kind-icon">Api<wbr>Client<wbr>Config</a></li>
 							</ul>
 						</section>
-						<section class="tsd-index-section tsd-is-external">
-							<h3>Object literals</h3>
-							<ul class="tsd-index-list">
-								<li class="tsd-kind-object-literal tsd-is-external"><a href="globals.html#clientoptions" class="tsd-kind-icon">Client<wbr>Options</a></li>
-							</ul>
-						</section>
 					</div>
 				</section>
 			</section>
@@ -110,19 +104,35 @@
 					<div class="tsd-signature tsd-kind-icon">Api<wbr>Client<wbr>Config<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">t.TypeOf</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-symbol">typeof </span><a href="globals.html#apiclientconfig" class="tsd-signature-type">ApiClientConfig</a><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in src/defaultApiClientManager.ts:15</li>
+							<li>Defined in src/defaultApiClientManager.ts:16</li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-type-alias tsd-is-external">
 					<a name="clientoptions" class="tsd-anchor"></a>
 					<h3>Client<wbr>Options</h3>
-					<div class="tsd-signature tsd-kind-icon">Client<wbr>Options<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">typeof </span><a href="globals.html#clientoptions" class="tsd-signature-type">ClientOptions</a></div>
+					<div class="tsd-signature tsd-kind-icon">Client<wbr>Options<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{ </span>disableOffline<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">false</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">true</span><span class="tsd-signature-symbol">; </span>link<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">ApolloLink</span><span class="tsd-signature-symbol"> }</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in src/defaultApiClientManager.ts:23</li>
+							<li>Defined in src/defaultApiClientManager.ts:21</li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>AWSAppSync client options</p>
+						</div>
+					</div>
+					<div class="tsd-type-declaration">
+						<h4>Type declaration</h4>
+						<ul class="tsd-parameters">
+							<li class="tsd-parameter">
+								<h5><span class="tsd-flag ts-flagOptional">Optional</span> disable<wbr>Offline<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">false</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">true</span></h5>
+							</li>
+							<li class="tsd-parameter">
+								<h5><span class="tsd-flag ts-flagOptional">Optional</span> link<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">ApolloLink</span></h5>
+							</li>
+						</ul>
+					</div>
 				</section>
 			</section>
 			<section class="tsd-panel-group tsd-member-group tsd-is-external">
@@ -133,7 +143,7 @@
 					<div class="tsd-signature tsd-kind-icon">Api<wbr>Client<wbr>Config<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">TypeC</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-symbol">{ </span>apiUrl<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">StringC</span><span class="tsd-signature-symbol">; </span>region<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">StringC</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> = t.type({region: t.string,apiUrl: t.string,})</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in src/defaultApiClientManager.ts:11</li>
+							<li>Defined in src/defaultApiClientManager.ts:12</li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -141,34 +151,6 @@
 							<p>Config required to setup an Api Client Manager</p>
 						</div>
 					</div>
-				</section>
-			</section>
-			<section class="tsd-panel-group tsd-member-group tsd-is-external">
-				<h2>Object literals</h2>
-				<section class="tsd-panel tsd-member tsd-kind-object-literal tsd-is-external">
-					<a name="clientoptions" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagConst">Const</span> Client<wbr>Options</h3>
-					<div class="tsd-signature tsd-kind-icon">Client<wbr>Options<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">object</span></div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in src/defaultApiClientManager.ts:20</li>
-						</ul>
-					</aside>
-					<div class="tsd-comment tsd-typography">
-						<div class="lead">
-							<p>AWSAppSync client options</p>
-						</div>
-					</div>
-					<section class="tsd-panel tsd-member tsd-kind-variable tsd-parent-kind-object-literal tsd-is-external">
-						<a name="clientoptions.disableoffline" class="tsd-anchor"></a>
-						<h3>disable<wbr>Offline</h3>
-						<div class="tsd-signature tsd-kind-icon">disable<wbr>Offline<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> = false</span></div>
-						<aside class="tsd-sources">
-							<ul>
-								<li>Defined in src/defaultApiClientManager.ts:21</li>
-							</ul>
-						</aside>
-					</section>
 				</section>
 			</section>
 		</div>
@@ -199,9 +181,6 @@
 					</li>
 					<li class=" tsd-kind-variable tsd-is-external">
 						<a href="globals.html#apiclientconfig" class="tsd-kind-icon">Api<wbr>Client<wbr>Config</a>
-					</li>
-					<li class=" tsd-kind-object-literal tsd-is-external">
-						<a href="globals.html#clientoptions" class="tsd-kind-icon">Client<wbr>Options</a>
 					</li>
 				</ul>
 			</nav>

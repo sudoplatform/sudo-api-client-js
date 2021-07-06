@@ -1,6 +1,7 @@
 import { DefaultConfigurationManager } from '@sudoplatform/sudo-common'
 import { SudoUserClient } from '@sudoplatform/sudo-user'
 import { NormalizedCacheObject } from 'apollo-cache-inmemory'
+import { ApolloLink } from 'apollo-link'
 import { AUTH_TYPE, AWSAppSyncClient } from 'aws-appsync'
 import * as t from 'io-ts'
 import { SudoUserClientNotSetError } from './error'
@@ -17,10 +18,10 @@ export type ApiClientConfig = t.TypeOf<typeof ApiClientConfig>
 /**
  * AWSAppSync client options
  */
-export const ClientOptions = {
-  disableOffline: false,
+export type ClientOptions = {
+  disableOffline?: boolean
+  link?: ApolloLink
 }
-export type ClientOptions = typeof ClientOptions
 
 /**
  * Manages a singleton GraphQL client instance that may be shared by multiple service clients.
@@ -132,23 +133,28 @@ export class DefaultApiClientManager implements ApiClientManager {
     if (!this._client) {
       const authClient = this._authClient
 
-      this._client = new AWSAppSyncClient({
-        url: this._config.apiUrl,
-        region: this._config.region,
-        auth: {
-          type: AUTH_TYPE.AMAZON_COGNITO_USER_POOLS,
-          jwtToken: async () => {
-            try {
-              return await authClient.getLatestAuthToken()
-            } catch (error) {
-              // Return empty string so the graphql request can fail and the error can be processed by the caller.
-              // This is a workaround for AWSAppSyncClient not handling rejected promise if getLatestAuthToken fails.
-              return ''
-            }
+      this._client = new AWSAppSyncClient(
+        {
+          url: this._config.apiUrl,
+          region: this._config.region,
+          auth: {
+            type: AUTH_TYPE.AMAZON_COGNITO_USER_POOLS,
+            jwtToken: async () => {
+              try {
+                return await authClient.getLatestAuthToken()
+              } catch (error) {
+                // Return empty string so the graphql request can fail and the error can be processed by the caller.
+                // This is a workaround for AWSAppSyncClient not handling rejected promise if getLatestAuthToken fails.
+                return ''
+              }
+            },
           },
+          disableOffline: options?.disableOffline ?? false,
         },
-        disableOffline: options?.disableOffline ?? false,
-      })
+        {
+          link: options?.link,
+        },
+      )
     }
 
     return this._client
@@ -156,7 +162,5 @@ export class DefaultApiClientManager implements ApiClientManager {
 
   public async reset(): Promise<void> {
     await this._client?.resetStore()
-    this._client = undefined
-    this._config = undefined
   }
 }
