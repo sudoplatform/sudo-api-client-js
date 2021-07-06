@@ -103,6 +103,7 @@ export class DefaultApiClientManager implements ApiClientManager {
 
   public setConfig(config: ApiClientConfig): DefaultApiClientManager {
     this._config = config
+    this._client = undefined
 
     return DefaultApiClientManager.instance
   }
@@ -155,5 +156,7 @@ export class DefaultApiClientManager implements ApiClientManager {
 
   public async reset(): Promise<void> {
     await this._client?.resetStore()
+    this._client = undefined
+    this._config = undefined
   }
 }
