@@ -104,7 +104,6 @@ export class DefaultApiClientManager implements ApiClientManager {
 
   public setConfig(config: ApiClientConfig): DefaultApiClientManager {
     this._config = config
-    this._client = undefined
 
     return DefaultApiClientManager.instance
   }
