@@ -21,6 +21,8 @@ export type ApiClientConfig = t.TypeOf<typeof ApiClientConfig>
 export type ClientOptions = {
   disableOffline?: boolean
   link?: ApolloLink
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  storage?: any
 }
 
 /**
@@ -149,6 +151,9 @@ export class DefaultApiClientManager implements ApiClientManager {
             },
           },
           disableOffline: options?.disableOffline ?? false,
+          offlineConfig: {
+            storage: options?.storage,
+          },
         },
         {
           link: options?.link,
