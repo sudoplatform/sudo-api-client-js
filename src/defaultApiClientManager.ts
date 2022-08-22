@@ -9,6 +9,7 @@ import { SudoUserClientNotSetError } from './error'
 /**
  * Config required to setup an Api Client Manager
  */
+// eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 export const ApiClientConfig = t.type({
   region: t.string,
   apiUrl: t.string,
@@ -152,6 +153,7 @@ export class DefaultApiClientManager implements ApiClientManager {
           },
           disableOffline: options?.disableOffline ?? false,
           offlineConfig: {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
             storage: options?.storage,
           },
         },

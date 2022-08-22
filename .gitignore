@@ -1,9 +1,11 @@
 .cache
 .yalc
+.DS_Store
 yalc.lock
 config
 docs
 lib
+cjs
 node_modules
 src/gen
 scratch

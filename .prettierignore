@@ -1,2 +1,10 @@
+cjs/
+coverage/
+node_modules/
+docs/
 lib/
+typings/
+.yarn/
+.vscode/
+config/
 coverage/

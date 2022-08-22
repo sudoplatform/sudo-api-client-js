@@ -8,8 +8,9 @@ module.exports = {
       env: { node: true },
     },
     {
-      files: ['**/*.ts'],
-      plugins: ['@typescript-eslint', 'import'],
+      files: ['src/**/*.ts'],
+      excludedFiles: ['**/*.spec.ts'],
+      plugins: ['@typescript-eslint', 'import', 'tree-shaking'],
       parser: '@typescript-eslint/parser',
       parserOptions: {
         project: './tsconfig.json',
@@ -41,6 +42,7 @@ module.exports = {
             allowTypedFunctionExpressions: true,
           },
         ],
+        'tree-shaking/no-side-effects-in-initialization': 2,
       },
     },
     {
@@ -56,6 +58,10 @@ module.exports = {
         'integration-tests/**/*.ts',
         'src/utils/testing/**/*.ts',
       ],
+      parser: '@typescript-eslint/parser',
+      parserOptions: {
+        project: './tsconfig.commonjs.json',
+      },
       rules: {
         '@typescript-eslint/no-explicit-any': 'off',
         '@typescript-eslint/no-non-null-assertion': 'off',
