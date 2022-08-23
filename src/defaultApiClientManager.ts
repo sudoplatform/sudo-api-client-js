@@ -62,7 +62,7 @@ export interface ApiClientManager {
    *
    * @returns AWSAppSyncClient<NormalizedCacheObject>
    *
-   * @throws {@link ConfigurationNotSetError}
+   * @throws ConfigurationNotSetError
    * @throws {@link SudoUserClientNotSetError}
    */
   getClient(options?: ClientOptions): AWSAppSyncClient<NormalizedCacheObject>

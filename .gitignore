@@ -6,6 +6,7 @@ config
 docs
 lib
 cjs
+types
 node_modules
 src/gen
 scratch
