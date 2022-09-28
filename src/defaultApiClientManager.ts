@@ -1,4 +1,7 @@
-import { DefaultConfigurationManager } from '@sudoplatform/sudo-common'
+import {
+  ConfigurationNotSetError,
+  DefaultConfigurationManager,
+} from '@sudoplatform/sudo-common'
 import { SudoUserClient } from '@sudoplatform/sudo-user'
 import { NormalizedCacheObject } from 'apollo-cache-inmemory'
 import { ApolloLink } from 'apollo-link'
@@ -7,7 +10,7 @@ import * as t from 'io-ts'
 import { SudoUserClientNotSetError } from './error'
 
 /**
- * Config required to setup an Api Client Manager
+ * Config required to set up an Api Client Manager
  */
 // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 export const ApiClientConfig = t.type({
@@ -17,17 +20,21 @@ export const ApiClientConfig = t.type({
 export type ApiClientConfig = t.TypeOf<typeof ApiClientConfig>
 
 /**
- * AWSAppSync client options
+ * Options which control how and where to connect to the AWSAppSync client
  */
 export type ClientOptions = {
   disableOffline?: boolean
   link?: ApolloLink
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   storage?: any
+  // Override the default appsync location configuration with that of a
+  // specific service endpoint by specifying that service's config namespace.
+  configNamespace?: string
 }
 
 /**
- * Manages a singleton GraphQL client instance that may be shared by multiple service clients.
+ * Manages one or more GraphQL client instances that may be shared by multiple service clients,
+ * depending on their configuration.
  */
 export interface ApiClientManager {
   /**
@@ -56,10 +63,9 @@ export interface ApiClientManager {
   unsetConfig(): void
 
   /**
-   * Create and fetch a new AWSAppSync client
+   * Create and fetch a new AWSAppSync client.
    *
-   * @param options ClientOptions for configuring AWSAppSyncClient
-   *
+   * @param options ClientOptions for configuring AWSAppSyncClient connection and location
    * @returns AWSAppSyncClient<NormalizedCacheObject>
    *
    * @throws ConfigurationNotSetError
@@ -73,15 +79,19 @@ export interface ApiClientManager {
   reset(): Promise<void>
 }
 
+const defaultConfigNamespace = 'apiService'
 /**
  * Singleton to manage a GraphQL client instance that may be shared by multiple service clients.
  */
 export class DefaultApiClientManager implements ApiClientManager {
   private static instance: DefaultApiClientManager
 
-  private _client: AWSAppSyncClient<NormalizedCacheObject> | undefined
   private _authClient: SudoUserClient | undefined
-  private _config: ApiClientConfig | undefined
+  private _defaultConfig: ApiClientConfig | undefined
+  private _namespacedClients: Record<
+    string,
+    AWSAppSyncClient<NormalizedCacheObject>
+  > = {}
 
   private constructor() {
     // Do nothing.
@@ -98,47 +108,50 @@ export class DefaultApiClientManager implements ApiClientManager {
   public setAuthClient(authClient: SudoUserClient): DefaultApiClientManager {
     if (authClient !== this._authClient) {
       this._authClient = authClient
-      // Invalidate any existing client since we have a new auth client
-      this._client = undefined
+      // Invalidate any existing clients since we have a new auth client
+      this._namespacedClients = {}
     }
 
     return DefaultApiClientManager.instance
   }
 
   public setConfig(config: ApiClientConfig): DefaultApiClientManager {
-    this._config = config
+    this._defaultConfig = config
 
     return DefaultApiClientManager.instance
   }
 
   public unsetConfig(): void {
-    this._config = undefined
+    this._defaultConfig = undefined
   }
 
   public getClient(
     options?: ClientOptions,
   ): AWSAppSyncClient<NormalizedCacheObject> {
-    if (!this._config) {
-      const config =
-        DefaultConfigurationManager.getInstance().bindConfigSet<ApiClientConfig>(
-          ApiClientConfig,
-          'apiService',
-        )
+    let configNamespace = options?.configNamespace ?? defaultConfigNamespace
 
-      this._config = config
+    const config = this.getConfigForNamespace(configNamespace)
+
+    if (!config) {
+      throw new ConfigurationNotSetError()
+    }
+
+    if (this.matchesDefaultConfig(config)) {
+      configNamespace = defaultConfigNamespace
     }
 
     if (!this._authClient) {
       throw new SudoUserClientNotSetError()
     }
 
-    if (!this._client) {
+    let client = this._namespacedClients[configNamespace]
+    if (!client) {
       const authClient = this._authClient
 
-      this._client = new AWSAppSyncClient(
+      client = new AWSAppSyncClient(
         {
-          url: this._config.apiUrl,
-          region: this._config.region,
+          url: config.apiUrl,
+          region: config.region,
           auth: {
             type: AUTH_TYPE.AMAZON_COGNITO_USER_POOLS,
             jwtToken: async () => {
@@ -161,12 +174,57 @@ export class DefaultApiClientManager implements ApiClientManager {
           link: options?.link,
         },
       )
+      this._namespacedClients[configNamespace] = client
     }
 
-    return this._client
+    return client
   }
 
   public async reset(): Promise<void> {
-    await this._client?.resetStore()
+    const promises = Object.values(this._namespacedClients).map(
+      async (v): Promise<void> => {
+        await v.resetStore()
+      },
+    )
+    await Promise.all(promises)
+  }
+
+  private getConfigForNamespace(
+    configNamespace: string,
+  ): ApiClientConfig | undefined {
+    return this.isDefaultConfigNamespace(configNamespace)
+      ? this.getDefaultConfig()
+      : this.createConfigForNamespace(configNamespace)
+  }
+
+  private isDefaultConfigNamespace(configNamespace: string): boolean {
+    return configNamespace === defaultConfigNamespace
+  }
+
+  private getDefaultConfig(): ApiClientConfig | undefined {
+    this._defaultConfig ??= this.createConfigForNamespace(
+      defaultConfigNamespace,
+    )
+
+    return this._defaultConfig
+  }
+
+  private createConfigForNamespace(
+    configNamespace: string,
+  ): ApiClientConfig | undefined {
+    return DefaultConfigurationManager.getInstance().bindConfigSet<ApiClientConfig>(
+      ApiClientConfig,
+      configNamespace,
+    )
+  }
+
+  private matchesDefaultConfig(config: ApiClientConfig): boolean {
+    if (!this._defaultConfig) {
+      return false
+    }
+    return (
+      config.apiUrl === this._defaultConfig.apiUrl &&
+      config.region === this._defaultConfig.region
+    )
   }
 }

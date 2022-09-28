@@ -41,7 +41,7 @@ describe('Api Client Manager', () => {
       registrationMethods: ['TEST', 'FSSO'],
       refreshTokenLifetime: 60,
     },
-    secureVaultService: {
+    alternativeService: {
       region: 'us-east-1',
       poolId: 'us-east-1_6NalHLdlq',
       clientId: 'pcg1ma18cluamqrif79viaj04',
@@ -118,6 +118,43 @@ describe('Api Client Manager', () => {
       expect(client).toBeDefined()
     })
 
+    it('should return separate clients for different config namespace', () => {
+      const clientConfig = {
+        region: 'us-east-1',
+        apiUrl: 'https://aws',
+      }
+
+      const clientOptions = {
+        disableOffline: true,
+      }
+
+      DefaultConfigurationManager.getInstance().setConfig(
+        JSON.stringify(sudoUserConfig),
+      )
+
+      const sudoUserClient = new DefaultSudoUserClient()
+
+      const client = DefaultApiClientManager.getInstance()
+        .setConfig(clientConfig)
+        .setAuthClient(sudoUserClient)
+        .getClient({ ...clientOptions, configNamespace: 'alternativeService' })
+
+      expect(client).toBeDefined()
+
+      const defaultClient =
+        DefaultApiClientManager.getInstance().getClient(clientOptions)
+
+      expect(defaultClient).toBeDefined()
+
+      let privateClients = (DefaultApiClientManager.getInstance() as any)[
+        '_namespacedClients'
+      ]
+
+      expect(Object.keys(privateClients).length).toEqual(2)
+      expect(privateClients.apiService).toBeDefined()
+      expect(privateClients.alternativeService).toBeDefined()
+    })
+
     it('should invalidate client when sudoUserClient is reset', () => {
       const clientConfig = {
         region: 'us-east-1',
@@ -147,18 +184,22 @@ describe('Api Client Manager', () => {
 
       expect(client).toBeDefined()
 
-      let privateClient = (DefaultApiClientManager.getInstance() as any)[
-        '_client'
+      let privateClients = (DefaultApiClientManager.getInstance() as any)[
+        '_namespacedClients'
       ]
-      expect(privateClient).toBeDefined()
+      expect(privateClients?.apiService).toBeDefined()
 
       DefaultApiClientManager.getInstance().setAuthClient(sudoUserClient2)
-      privateClient = (DefaultApiClientManager.getInstance() as any)['_client']
-      expect(privateClient).toBeUndefined()
+      privateClients = (DefaultApiClientManager.getInstance() as any)[
+        '_namespacedClients'
+      ]
+      expect(privateClients?.apiService).toBeUndefined()
 
-      client = DefaultApiClientManager.getInstance().getClient()
-      privateClient = (DefaultApiClientManager.getInstance() as any)['_client']
-      expect(privateClient).toBeDefined()
+      client = DefaultApiClientManager.getInstance().getClient(clientOptions)
+      privateClients = (DefaultApiClientManager.getInstance() as any)[
+        '_namespacedClients'
+      ]
+      expect(privateClients?.apiService).toBeDefined()
     })
   })
 })
