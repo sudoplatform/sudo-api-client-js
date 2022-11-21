@@ -3,6 +3,7 @@ import {
   DefaultConfigurationManager,
 } from '@sudoplatform/sudo-common'
 import { SudoUserClient } from '@sudoplatform/sudo-user'
+import { ApolloCache } from 'apollo-cache'
 import { NormalizedCacheObject } from 'apollo-cache-inmemory'
 import { ApolloLink } from 'apollo-link'
 import { AUTH_TYPE, AWSAppSyncClient } from 'aws-appsync'
@@ -25,6 +26,9 @@ export type ApiClientConfig = t.TypeOf<typeof ApiClientConfig>
 export type ClientOptions = {
   disableOffline?: boolean
   link?: ApolloLink
+  // Override the default cache to support configuring the type of fragment
+  // matcher. This allows support of fragments with union and interface types.
+  cache?: ApolloCache<NormalizedCacheObject>
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   storage?: any
   // Override the default appsync location configuration with that of a
@@ -172,6 +176,7 @@ export class DefaultApiClientManager implements ApiClientManager {
         },
         {
           link: options?.link,
+          cache: options?.cache,
         },
       )
       this._namespacedClients[configNamespace] = client
