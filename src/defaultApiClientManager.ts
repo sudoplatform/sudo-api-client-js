@@ -4,7 +4,12 @@ import {
 } from '@sudoplatform/sudo-common'
 import { SudoUserClient } from '@sudoplatform/sudo-user'
 import { ApolloCache } from 'apollo-cache'
-import { NormalizedCacheObject } from 'apollo-cache-inmemory'
+import {
+  InMemoryCache,
+  IntrospectionFragmentMatcher,
+  IntrospectionResultData,
+  NormalizedCacheObject,
+} from 'apollo-cache-inmemory'
 import { ApolloLink } from 'apollo-link'
 import { AUTH_TYPE, AWSAppSyncClient } from 'aws-appsync'
 import * as t from 'io-ts'
@@ -152,6 +157,27 @@ export class DefaultApiClientManager implements ApiClientManager {
     if (!client) {
       const authClient = this._authClient
 
+      let cache = options?.cache
+      if (!cache) {
+        /*
+         * By default, add an InMemory cache with
+         * a fragment matcher with empty types array.
+         * This allows union types and types derived
+         * from interfaces to be disambiguated in most
+         * cases. In particular we rely on this in
+         * the virtual cards SDK.
+         */
+        const id: IntrospectionResultData = {
+          __schema: {
+            types: [],
+          },
+        }
+        const fragmentMatcher = new IntrospectionFragmentMatcher({
+          introspectionQueryResultData: id,
+        })
+        cache = new InMemoryCache({ fragmentMatcher })
+      }
+
       client = new AWSAppSyncClient(
         {
           url: config.apiUrl,
@@ -176,7 +202,7 @@ export class DefaultApiClientManager implements ApiClientManager {
         },
         {
           link: options?.link,
-          cache: options?.cache,
+          cache,
         },
       )
       this._namespacedClients[configNamespace] = client
