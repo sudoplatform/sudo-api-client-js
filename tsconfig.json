@@ -13,6 +13,7 @@
     "resolveJsonModule": true,
     "sourceMap": true,
     "strict": true,
+    "skipLibCheck": true,
     "target": "ES2020",
     "typeRoots": ["./node_modules/@types", "./typings"]
   },
