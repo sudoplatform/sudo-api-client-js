@@ -193,7 +193,7 @@ export class DefaultApiClientManager implements ApiClientManager {
             jwtToken: async () => {
               try {
                 return await authClient.getLatestAuthToken()
-              } catch (error) {
+              } catch {
                 // Return empty string so the graphql request can fail and the error can be processed by the caller.
                 // This is a workaround for AWSAppSyncClient not handling rejected promise if getLatestAuthToken fails.
                 return ''
