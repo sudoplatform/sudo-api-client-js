@@ -89,6 +89,16 @@ export interface ApiClientManager {
   getClient(options?: ClientOptions): AWSAppSyncClient<NormalizedCacheObject>
 
   /**
+   * Returns the default client config associated with the provided configNamespace,
+   * or the default configNamespace if none is provided.
+   *
+   * @param configNamespace The namespace of the config to retrieve the default client options for.
+   * @returns The default client config associated with the provided configNamespace,
+   * or the default configNamespace if none is provided.
+   */
+  getApiClientConfig(configNamespace?: string): ApiClientConfig
+
+  /**
    * Clears caches on the client
    */
   reset(): Promise<void>
@@ -217,6 +227,19 @@ export class DefaultApiClientManager implements ApiClientManager {
     return client
   }
 
+  public getApiClientConfig(configNamespace?: string): ApiClientConfig {
+    const configNamespaceToUse = configNamespace ?? defaultConfigNamespace
+
+    const config = this.getConfigForNamespace(configNamespaceToUse)
+
+    if (!config) {
+      throw new ConfigurationNotSetError()
+    }
+    return {
+      apiUrl: config.apiUrl,
+      region: config.region,
+    }
+  }
   public async reset(): Promise<void> {
     const promises = Object.values(this._namespacedClients).map(
       async (v): Promise<void> => {

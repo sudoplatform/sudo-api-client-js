@@ -12,3 +12,4 @@ src/gen
 scratch
 yarn-error.log
 coverage
+.yarn/install-state.gz

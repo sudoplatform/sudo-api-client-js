@@ -6,6 +6,7 @@
 
 import {
   ConfigurationNotSetError,
+  ConfigurationSetNotFoundError,
   DefaultConfigurationManager,
   DefaultLogger,
 } from '@sudoplatform/sudo-common'
@@ -201,11 +202,118 @@ describe('Api Client Manager', () => {
       ]
       expect(privateClients?.apiService).toBeUndefined()
 
-      client = DefaultApiClientManager.getInstance().getClient(clientOptions)
+      DefaultApiClientManager.getInstance().getClient(clientOptions)
       privateClients = (DefaultApiClientManager.getInstance() as any)[
         '_namespacedClients'
       ]
       expect(privateClients?.apiService).toBeDefined()
+    })
+  })
+
+  describe('getApiClientConfig', () => {
+    it('should throw Error if config not set and no default configuration available', () => {
+      DefaultConfigurationManager.getInstance().setConfig('')
+      const apiClientManager = DefaultApiClientManager.getInstance()
+
+      expect(() => {
+        apiClientManager.getApiClientConfig()
+      }).toThrow(ConfigurationNotSetError)
+    })
+
+    it('should return default config when no namespace provided', () => {
+      const config = {
+        region: 'us-east-1',
+        apiUrl: 'https://test-api.aws.com/graphql',
+      }
+
+      const apiClientManager =
+        DefaultApiClientManager.getInstance().setConfig(config)
+
+      const result = apiClientManager.getApiClientConfig()
+
+      expect(result).toEqual(config)
+    })
+
+    it('should return default config when apiService namespace provided explicitly', () => {
+      const config = {
+        region: 'us-east-1',
+        apiUrl: 'https://test-api.aws.com/graphql',
+      }
+
+      const apiClientManager =
+        DefaultApiClientManager.getInstance().setConfig(config)
+
+      const result = apiClientManager.getApiClientConfig('apiService')
+
+      expect(result).toEqual(config)
+    })
+
+    it('should return alternative service config when alternativeService namespace provided', () => {
+      DefaultConfigurationManager.getInstance().setConfig(
+        JSON.stringify(sudoUserConfig),
+      )
+
+      DefaultApiClientManager.getInstance().unsetConfig()
+
+      const apiClientManager = DefaultApiClientManager.getInstance()
+
+      const result = apiClientManager.getApiClientConfig('alternativeService')
+
+      expect(result).toEqual({
+        region: 'us-east-1',
+        apiUrl:
+          'https://u2ysyzwojzaahbsq5toulhdt4e.appsync-api.us-east-1.amazonaws.com/graphql',
+      })
+    })
+
+    it('should fallback to configuration manager when no explicit config set', () => {
+      DefaultConfigurationManager.getInstance().setConfig(
+        JSON.stringify(sudoUserConfig),
+      )
+
+      DefaultApiClientManager.getInstance().unsetConfig()
+
+      const apiClientManager = DefaultApiClientManager.getInstance()
+
+      const result = apiClientManager.getApiClientConfig()
+
+      expect(result).toEqual({
+        region: 'us-east-1',
+        apiUrl:
+          'https://xy7zw5ys7rahrponv7h26vjn6y.appsync-api.us-east-1.amazonaws.com/graphql',
+      })
+    })
+
+    it('should throw Error for non-existent namespace', () => {
+      DefaultConfigurationManager.getInstance().setConfig(
+        JSON.stringify(sudoUserConfig),
+      )
+
+      DefaultApiClientManager.getInstance().unsetConfig()
+
+      const apiClientManager = DefaultApiClientManager.getInstance()
+
+      expect(() => {
+        apiClientManager.getApiClientConfig('nonExistentService')
+      }).toThrow(new ConfigurationSetNotFoundError('nonExistentService'))
+    })
+
+    it('should prefer explicit config over configuration manager for default namespace', () => {
+      const explicitConfig = {
+        region: 'us-west-2',
+        apiUrl: 'https://explicit-api.aws.com/graphql',
+      }
+
+      DefaultConfigurationManager.getInstance().setConfig(
+        JSON.stringify(sudoUserConfig),
+      )
+
+      const apiClientManager =
+        DefaultApiClientManager.getInstance().setConfig(explicitConfig)
+
+      const result = apiClientManager.getApiClientConfig()
+
+      expect(result).toEqual(explicitConfig)
     })
   })
 })

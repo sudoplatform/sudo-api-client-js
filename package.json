@@ -14,7 +14,7 @@
     "lint:prettier": "prettier -l \"**/*.{js,json,ts,yml}\"",
     "test": "jest",
     "build": "yarn clean && yarn build:transpile && yarn build:verify && yarn build:docs",
-    "build:verify": "yarn audit-with-suppressions && yarn lint && yarn test",
+    "build:verify": "./node_modules/.bin/audit-with-suppressions && yarn lint && yarn test",
     "build:transpile": "concurrently \"yarn build:transpile:declarations\" \"yarn build:transpile:cjs\" \"yarn build:transpile:esm\"",
     "build:transpile:cjs": "tsc --project tsconfig.commonjs.json",
     "build:transpile:esm": "tsc",
@@ -43,19 +43,19 @@
     "apollo-link": "^1.2.14"
   },
   "devDependencies": {
-    "@sudoplatform/sudo-common": "^10.0.0",
-    "@sudoplatform/sudo-user": "^15.0.0",
+    "@sudoplatform/sudo-common": "^11.0.0",
+    "@sudoplatform/sudo-user": "^15.1.1",
     "@types/jest": "^29.5.14",
-    "@typescript-eslint/eslint-plugin": "^8.18.0",
-    "@typescript-eslint/parser": "^8.18.0",
+    "@typescript-eslint/eslint-plugin": "^8.44.1",
+    "@typescript-eslint/parser": "^8.44.1",
     "aws-appsync": "^4.1.10",
-    "concurrently": "^9.1.0",
+    "concurrently": "^9.2.1",
     "eslint": "^8.57.1",
-    "eslint-config-prettier": "^9.1.0",
-    "eslint-plugin-import": "^2.31.0",
-    "eslint-plugin-prettier": "^5.2.1",
+    "eslint-config-prettier": "^9.1.2",
+    "eslint-plugin-import": "^2.32.0",
+    "eslint-plugin-prettier": "^5.5.4",
     "eslint-plugin-tree-shaking": "^1.12.2",
-    "fp-ts": "^2.16.9",
+    "fp-ts": "^2.16.11",
     "graphql": "~15.9.0",
     "io-ts": "^2.2.22",
     "io-ts-types": "^0.5.19",
@@ -64,12 +64,12 @@
     "jest-environment-jsdom": "^29.7.0",
     "monocle-ts": "^2.3.13",
     "newtype-ts": "^0.3.5",
-    "prettier": "^3.4.2",
+    "prettier": "^3.6.2",
     "redux": "^5.0.1",
-    "ts-jest": "^29.2.5",
+    "ts-jest": "^29.4.4",
     "ts-mockito": "^2.6.1",
-    "typedoc": "^0.27.4",
-    "typescript": "^5.7.2"
+    "typedoc": "^0.28.13",
+    "typescript": "^5.9.2"
   },
   "resolutions": {
     "apollo-cache-inmemory": "^1.6.6"
@@ -82,5 +82,6 @@
   },
   "engines": {
     "node": ">=20"
-  }
+  },
+  "packageManager": "yarn@4.10.3+sha512.c38cafb5c7bb273f3926d04e55e1d8c9dfa7d9c3ea1f36a4868fa028b9e5f72298f0b7f401ad5eb921749eb012eb1c3bb74bf7503df3ee43fd600d14a018266f"
 }
