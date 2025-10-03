@@ -28,4 +28,4 @@ jobs:
           npm version $TAG_VERSION --no-git-tag-version
 
       - name: Publish to npm (OIDC Trusted Publisher)
-        run: npm publish --provenance
+        run: npm publish
