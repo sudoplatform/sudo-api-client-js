@@ -4,7 +4,7 @@
   "author": "Anonyome Labs, Inc.",
   "repository": {
     "type": "git",
-    "url": "https://github.com/sudoplatform/sudo-api-client-js.git"
+    "url": "git+https://github.com/sudoplatform/sudo-api-client-js.git"
   },
   "license": "Apache-2.0",
   "scripts": {
