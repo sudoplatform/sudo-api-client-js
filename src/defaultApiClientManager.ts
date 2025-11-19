@@ -9,17 +9,10 @@ import {
   DefaultConfigurationManager,
 } from '@sudoplatform/sudo-common'
 import { SudoUserClient } from '@sudoplatform/sudo-user'
-import { ApolloCache } from 'apollo-cache'
-import {
-  InMemoryCache,
-  IntrospectionFragmentMatcher,
-  IntrospectionResultData,
-  NormalizedCacheObject,
-} from 'apollo-cache-inmemory'
-import { ApolloLink } from 'apollo-link'
-import { AUTH_TYPE, AWSAppSyncClient } from 'aws-appsync'
+import { internal } from '@sudoplatform/sudo-user'
 import * as t from 'io-ts'
 import { SudoUserClientNotSetError } from './error'
+import { GraphQLClient } from '@sudoplatform/sudo-user'
 
 /**
  * Config required to set up an Api Client Manager
@@ -32,16 +25,9 @@ export const ApiClientConfig = t.type({
 export type ApiClientConfig = t.TypeOf<typeof ApiClientConfig>
 
 /**
- * Options which control how and where to connect to the AWSAppSync client
+ * Options which control how and where to connect to the AppSync client
  */
 export type ClientOptions = {
-  disableOffline?: boolean
-  link?: ApolloLink
-  // Override the default cache to support configuring the type of fragment
-  // matcher. This allows support of fragments with union and interface types.
-  cache?: ApolloCache<NormalizedCacheObject>
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  storage?: any
   // Override the default appsync location configuration with that of a
   // specific service endpoint by specifying that service's config namespace.
   configNamespace?: string
@@ -78,15 +64,15 @@ export interface ApiClientManager {
   unsetConfig(): void
 
   /**
-   * Create and fetch a new AWSAppSync client.
+   * Create and fetch a new GraphQL client.
    *
-   * @param options ClientOptions for configuring AWSAppSyncClient connection and location
-   * @returns AWSAppSyncClient<NormalizedCacheObject>
+   * @param options ClientOptions for configuring AmplifyClient connection and location
+   * @returns GraphQLClient
    *
    * @throws ConfigurationNotSetError
    * @throws {@link SudoUserClientNotSetError}
    */
-  getClient(options?: ClientOptions): AWSAppSyncClient<NormalizedCacheObject>
+  getClient(options?: ClientOptions): GraphQLClient
 
   /**
    * Returns the default client config associated with the provided configNamespace,
@@ -113,10 +99,7 @@ export class DefaultApiClientManager implements ApiClientManager {
 
   private _authClient: SudoUserClient | undefined
   private _defaultConfig: ApiClientConfig | undefined
-  private _namespacedClients: Record<
-    string,
-    AWSAppSyncClient<NormalizedCacheObject>
-  > = {}
+  private _namespacedClients: Record<string, GraphQLClient> = {}
 
   private constructor() {
     // Do nothing.
@@ -150,9 +133,7 @@ export class DefaultApiClientManager implements ApiClientManager {
     this._defaultConfig = undefined
   }
 
-  public getClient(
-    options?: ClientOptions,
-  ): AWSAppSyncClient<NormalizedCacheObject> {
+  public getClient(options?: ClientOptions): GraphQLClient {
     let configNamespace = options?.configNamespace ?? defaultConfigNamespace
 
     const config = this.getConfigForNamespace(configNamespace)
@@ -173,54 +154,18 @@ export class DefaultApiClientManager implements ApiClientManager {
     if (!client) {
       const authClient = this._authClient
 
-      let cache = options?.cache
-      if (!cache) {
-        /*
-         * By default, add an InMemory cache with
-         * a fragment matcher with empty types array.
-         * This allows union types and types derived
-         * from interfaces to be disambiguated in most
-         * cases. In particular we rely on this in
-         * the virtual cards SDK.
-         */
-        const id: IntrospectionResultData = {
-          __schema: {
-            types: [],
-          },
-        }
-        const fragmentMatcher = new IntrospectionFragmentMatcher({
-          introspectionQueryResultData: id,
-        })
-        cache = new InMemoryCache({ fragmentMatcher })
-      }
-
-      client = new AWSAppSyncClient(
-        {
-          url: config.apiUrl,
-          region: config.region,
-          auth: {
-            type: AUTH_TYPE.AMAZON_COGNITO_USER_POOLS,
-            jwtToken: async () => {
-              try {
-                return await authClient.getLatestAuthToken()
-              } catch {
-                // Return empty string so the graphql request can fail and the error can be processed by the caller.
-                // This is a workaround for AWSAppSyncClient not handling rejected promise if getLatestAuthToken fails.
-                return ''
-              }
-            },
-          },
-          disableOffline: options?.disableOffline ?? false,
-          offlineConfig: {
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-            storage: options?.storage,
-          },
+      client = new internal.AmplifyClient({
+        graphqlUrl: config.apiUrl,
+        region: config.region,
+        tokenProvider: async () => {
+          try {
+            return await authClient.getLatestAuthToken()
+          } catch {
+            // Return empty string so the graphql request can fail and the error can be processed by the caller.
+            return ''
+          }
         },
-        {
-          link: options?.link,
-          cache,
-        },
-      )
+      })
       this._namespacedClients[configNamespace] = client
     }
 
@@ -241,12 +186,7 @@ export class DefaultApiClientManager implements ApiClientManager {
     }
   }
   public async reset(): Promise<void> {
-    const promises = Object.values(this._namespacedClients).map(
-      async (v): Promise<void> => {
-        await v.resetStore()
-      },
-    )
-    await Promise.all(promises)
+    await Promise.resolve()
   }
 
   private getConfigForNamespace(

@@ -90,13 +90,9 @@ describe('Api Client Manager', () => {
 
       const sudoUserClient = new DefaultSudoUserClient()
 
-      const clientOptions = {
-        disableOffline: true,
-      }
-
       const client = DefaultApiClientManager.getInstance()
         .setAuthClient(sudoUserClient)
-        .getClient(clientOptions)
+        .getClient()
 
       expect(client).toBeDefined()
     })
@@ -107,10 +103,6 @@ describe('Api Client Manager', () => {
         apiUrl: 'https://aws',
       }
 
-      const clientOptions = {
-        disableOffline: true,
-      }
-
       DefaultConfigurationManager.getInstance().setConfig(
         JSON.stringify(sudoUserConfig),
       )
@@ -120,7 +112,7 @@ describe('Api Client Manager', () => {
       const client = DefaultApiClientManager.getInstance()
         .setConfig(clientConfig)
         .setAuthClient(sudoUserClient)
-        .getClient(clientOptions)
+        .getClient()
 
       expect(client).toBeDefined()
     })
@@ -131,10 +123,6 @@ describe('Api Client Manager', () => {
         apiUrl: 'https://aws',
       }
 
-      const clientOptions = {
-        disableOffline: true,
-      }
-
       DefaultConfigurationManager.getInstance().setConfig(
         JSON.stringify(sudoUserConfig),
       )
@@ -144,12 +132,11 @@ describe('Api Client Manager', () => {
       const client = DefaultApiClientManager.getInstance()
         .setConfig(clientConfig)
         .setAuthClient(sudoUserClient)
-        .getClient({ ...clientOptions, configNamespace: 'alternativeService' })
+        .getClient({ configNamespace: 'alternativeService' })
 
       expect(client).toBeDefined()
 
-      const defaultClient =
-        DefaultApiClientManager.getInstance().getClient(clientOptions)
+      const defaultClient = DefaultApiClientManager.getInstance().getClient()
 
       expect(defaultClient).toBeDefined()
 
@@ -168,10 +155,6 @@ describe('Api Client Manager', () => {
         apiUrl: 'https://aws',
       }
 
-      const clientOptions = {
-        disableOffline: true,
-      }
-
       DefaultConfigurationManager.getInstance().setConfig(
         JSON.stringify(sudoUserConfig),
       )
@@ -187,7 +170,7 @@ describe('Api Client Manager', () => {
       let client = DefaultApiClientManager.getInstance()
         .setConfig(clientConfig)
         .setAuthClient(sudoUserClient1)
-        .getClient(clientOptions)
+        .getClient()
 
       expect(client).toBeDefined()
 
@@ -202,7 +185,7 @@ describe('Api Client Manager', () => {
       ]
       expect(privateClients?.apiService).toBeUndefined()
 
-      DefaultApiClientManager.getInstance().getClient(clientOptions)
+      DefaultApiClientManager.getInstance().getClient()
       privateClients = (DefaultApiClientManager.getInstance() as any)[
         '_namespacedClients'
       ]
