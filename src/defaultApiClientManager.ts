@@ -17,12 +17,10 @@ import { GraphQLClient } from '@sudoplatform/sudo-user'
 /**
  * Config required to set up an Api Client Manager
  */
-// eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
-export const ApiClientConfig = t.type({
-  region: t.string,
-  apiUrl: t.string,
-})
-export type ApiClientConfig = t.TypeOf<typeof ApiClientConfig>
+export interface ApiClientConfig {
+  region: string
+  apiUrl: string
+}
 
 /**
  * Options which control how and where to connect to the AppSync client
@@ -213,7 +211,10 @@ export class DefaultApiClientManager implements ApiClientManager {
     configNamespace: string,
   ): ApiClientConfig | undefined {
     return DefaultConfigurationManager.getInstance().bindConfigSet<ApiClientConfig>(
-      ApiClientConfig,
+      t.type({
+        region: t.string,
+        apiUrl: t.string,
+      }),
       configNamespace,
     )
   }

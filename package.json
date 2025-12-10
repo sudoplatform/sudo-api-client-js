@@ -38,9 +38,12 @@
     "docs",
     "types"
   ],
+  "dependencies": {
+    "io-ts": "^2.2.22"
+  },
   "devDependencies": {
     "@sudoplatform/sudo-common": "^12.2.0",
-    "@sudoplatform/sudo-user": "^16.0.0",
+    "@sudoplatform/sudo-user": "^16.0.1",
     "@types/jest": "^29.5.14",
     "@typescript-eslint/eslint-plugin": "^8.44.1",
     "@typescript-eslint/parser": "^8.44.1",
@@ -53,7 +56,6 @@
     "eslint-plugin-tree-shaking": "^1.12.2",
     "fp-ts": "^2.16.11",
     "graphql": "^16.12.0",
-    "io-ts": "^2.2.22",
     "io-ts-types": "^0.5.19",
     "isomorphic-fetch": "^3.0.0",
     "jest": "^29.7.0",
@@ -69,23 +71,10 @@
   },
   "peerDependencies": {
     "@sudoplatform/sudo-common": "^12.2.0",
-    "@sudoplatform/sudo-user": "^16.0.0",
-    "io-ts": "^2.2.20"
+    "@sudoplatform/sudo-user": "^16.0.0"
   },
   "engines": {
     "node": ">=20"
   },
-  "packageManager": "yarn@4.10.3+sha512.c38cafb5c7bb273f3926d04e55e1d8c9dfa7d9c3ea1f36a4868fa028b9e5f72298f0b7f401ad5eb921749eb012eb1c3bb74bf7503df3ee43fd600d14a018266f",
-  "auditSuppressions": {
-    "1109801": {
-      "until": 1766130647,
-      "untilISO": "2025-12-19T07:50:47Z",
-      "reason": "Waiting for js-yaml update"
-    },
-    "1109802": {
-      "until": 1766130642,
-      "untilISO": "2025-12-19T07:50:42Z",
-      "reason": "Waiting for js-yaml update"
-    }
-  }
+  "packageManager": "yarn@4.12.0+sha512.f45ab632439a67f8bc759bf32ead036a1f413287b9042726b7cc4818b7b49e14e9423ba49b18f9e06ea4941c1ad062385b1d8760a8d5091a1a31e5f6219afca8"
 }
